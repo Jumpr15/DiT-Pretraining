@@ -72,20 +72,20 @@ def main():
      
      model = DIT.from_pretrained(
 	     hf_repo,
-          batch_size,
-          patch_size,
-          out_channels,
-          in_dims,
-          embed_dims,
-          head_size,
-          num_heads,
-          block_num,
-          lr,
-          iterations,
-          latent_h,
-          latent_w,
-          vae,
-          vae_scale_factor
+          batch_size=batch_size,
+          patch_size=patch_size,
+          out_channels=out_channels,
+          in_dims=in_dims,
+          embed_dims=embed_dims,
+          head_size=head_size,
+          num_heads=num_heads,
+          block_num=block_num,
+          lr=lr,
+          iterations=iterations,
+          latent_h=latent_h,
+          load_dataset=latent_w,
+          vae=vae,
+          vae_scale_factor=vae_scale_factor
      )
 
      if run_id is None:
@@ -119,7 +119,6 @@ def main():
      trainer.fit(
           model, 
           train_dataloaders=train_dataloader,
-          ckpt_path=ckpt_path
      ) 
 
 if __name__ == "__main__":
