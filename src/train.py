@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from huggingface_hub import hf_hub_download
+
 import pytorch_lightning as L
 from pytorch_lightning.loggers import WandbLogger
 
@@ -55,7 +57,13 @@ def main():
           acc_grad = config['acc_grad']
           lr = config['lr']
      
-     ckpt_path = get_latest_checkpoint(hf_repo, local_dir=ckpt_dir)
+     # ckpt_path = get_latest_checkpoint(hf_repo, local_dir=ckpt_dir)
+     ckpt_path = hf_hub_download(
+          repo_id=hf_repo,
+          filename="model.safetensors",
+          repo_type="model",
+          local_dir=ckpt_dir
+     )
      
      ds = load_dataset(
           dataset,
