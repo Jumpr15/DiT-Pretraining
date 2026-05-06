@@ -36,10 +36,13 @@ class DIT(L.LightningModule, PyTorchModelHubMixin):
         latent_w,
         vae,
         vae_scale_factor,
-        t_channels=256
+        t_channels=256,
+        pre_encoded_latents=False
     ):
         super().__init__()
         self.save_hyperparameters()
+        
+        self.pre_encoded_latents = pre_encoded_latents
         
         self.lr = float(lr)
         self.iterations = int(iterations)
@@ -186,10 +189,10 @@ class DIT(L.LightningModule, PyTorchModelHubMixin):
 
         return out
 
-    def training_step(self, batch, batch_idx, pre_encoded_latents=False):
+    def training_step(self, batch, batch_idx):
         img, text_label = batch
         
-        if pre_encoded_latents is False:
+        if self.pre_encoded_latents is False:
             text_embed = self.text_embedder(text_label)
             
             with torch.no_grad():
