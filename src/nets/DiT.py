@@ -186,19 +186,20 @@ class DIT(L.LightningModule, PyTorchModelHubMixin):
 
         return out
 
-    def training_step(self, batch, batch_idx):
+    def training_step(self, batch, batch_idx, pre_encoded_latents=False):
         img, text_label = batch
         
-        with torch.no_grad():
-            l_img = self.vae.encode(img.to(device))
-            l_sample = l_img.latent_dist.sample() * self.vae_scale_factor
+        if pre_encoded_latents is False:
+            text_embed = self.text_embedder(text_label)
+            
+            with torch.no_grad():
+                l_img = self.vae.encode(img.to(device))
+                l_sample = l_img.latent_dist.sample() * self.vae_scale_factor
             
         noise = torch.randn_like(l_sample)
         steps = torch.randint(self.scheduler.config.num_train_timesteps, (l_sample.shape[0], )).to(device)
         noised_latents = self.scheduler.add_noise(l_sample, noise, steps)
         patched_latent = self.patchify(noised_latents).transpose(1, 2)
-        
-        text_embed = self.text_embedder(text_label)
         
         out = self(patched_latent, text_embed, steps)
         loss = F.mse_loss(out, noise)
