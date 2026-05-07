@@ -64,7 +64,7 @@ def main():
 
      # img_ds = ImgDataset(ds) #. hw patches hardcoded
      
-     path_to_dir = 'images'
+     path_to_dir = 'src/images'
      img_ds = ImgDirDataset(path_to_dir)
      
      train_dataloader = DataLoader(
