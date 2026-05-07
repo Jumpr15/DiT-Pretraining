@@ -12,6 +12,7 @@ from datasets import load_dataset
 import yaml
 
 from data_module.dataset import ImgDataset
+from dir_dataset import ImgDirDataset
 from nets.DiT import DIT
 
 
@@ -56,14 +57,19 @@ def main():
           acc_grad = config['acc_grad']
           lr = config['lr']
      
-     ds = load_dataset(
-          dataset,
-          split="train"
-     )
+     # ds = load_dataset(
+     #      dataset,
+     #      split="train"
+     # )
 
-     img_ds = ImgDataset(ds) #. hw patches hardcoded
+     # img_ds = ImgDataset(ds) #. hw patches hardcoded
+     
+     path_to_dir = 'images'
+     img_ds = ImgDirDataset(path_to_dir)
+     
      train_dataloader = DataLoader(
-          img_ds, batch_size=batch_size, 
+          img_ds, 
+          batch_size=batch_size, 
           shuffle=True, 
           num_workers=num_workers,
           drop_last=True, 
