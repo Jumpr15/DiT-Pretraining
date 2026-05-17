@@ -9,8 +9,6 @@ from diffusers.models.embeddings import get_2d_sincos_pos_embed
 from huggingface_hub import PyTorchModelHubMixin
 import PIL.Image as Image
 
-from ema_pytorch import EMA
-
 from nets.embeddingLayers.textEmbed import TextEmbed
 from nets.embeddingLayers.timestepEmbed import TimestepEmbed
 
@@ -94,16 +92,6 @@ class DIT(L.LightningModule, PyTorchModelHubMixin):
         self.final_layer = FinalLayer(embed_dims, patch_size, out_channels)
 
         self.scheduler = diffusers.schedulers.DDPMScheduler()
-        
-        object.__setattr__(self, 'ema_model', EMA(
-            self,
-            beta=0.9999,
-            update_after_step=100,
-            update_every=10,
-            inv_gamma=1.0,
-            power=2/3,
-        )) # prevents lightning module recursion
-        self.register_buffer("ema_step", torch.tensor(0))
 
         self.initialize_weights()
 
@@ -124,13 +112,6 @@ class DIT(L.LightningModule, PyTorchModelHubMixin):
             "optimizer": optimizer,
             "lr_scheduler": {"scheduler": scheduler, "interval": "step"},
         }
-
-    def on_fit_start(self):
-        self.ema_model.to(device) # move ema to gpu
-        
-    def on_after_backward(self):
-        self.ema_model.update()
-        self.ema_step += 1
 
     def initialize_weights(self):
         # basic xavier weight inits for linear layers
@@ -223,7 +204,7 @@ class DIT(L.LightningModule, PyTorchModelHubMixin):
         self.log("train_loss", loss)
         return loss
 
-    def inference(self, text, num_steps=50, guidance_scale=5, use_ema_weights=False):
+    def inference(self, text, num_steps=50, guidance_scale=5):
         self.eval()
         self.scheduler.set_timesteps(num_steps)
         
@@ -242,19 +223,16 @@ class DIT(L.LightningModule, PyTorchModelHubMixin):
                 patched_latent = patched_latent.repeat(2, 1, 1, 1)
                 timestep = timestep.repeat(2)
                 
-                if use_ema_weights is True: # Not working
-                    pass
-                #     noise_pred = self.ema_model.ema_model(patched_latent, text_embed, timestep) # using ema weights
-                else:  
-                    noise_pred = self(patched_latent, text_embed, timestep) # predicted noise
-                    
-                    # split into conditioned and unconditioned
-                    noise_pred_uncond = noise_pred[0:1]
-                    noise_pred_cond = noise_pred[1:2]
-                    
-                    noise_pred = noise_pred_uncond + guidance_scale * (
-                        noise_pred_cond - noise_pred_uncond
-                    )
+
+                noise_pred = self(patched_latent, text_embed, timestep) # predicted noise
+                
+                # split into conditioned and unconditioned
+                noise_pred_uncond = noise_pred[0:1]
+                noise_pred_cond = noise_pred[1:2]
+                
+                noise_pred = noise_pred_uncond + guidance_scale * (
+                    noise_pred_cond - noise_pred_uncond
+                )
 
                 noise_pred_cpu = noise_pred.cpu()
                 latent_img_cpu = latent_img.cpu()

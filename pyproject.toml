@@ -11,6 +11,7 @@ dependencies = [
     "diffusers>=0.37.1",
     "ema-pytorch>=0.7.9",
     "huggingface-hub>=1.12.2",
+    "modal>=1.4.2",
     "pillow>=12.2.0",
     "pytorch-lightning==2.5.1",  # <-- older, stable version
     "pyyaml>=6.0.3",
