@@ -1,7 +1,7 @@
 # DiT Training Code
-Pretraining code for text-to-image latent diffusion transformer based off  [Pixart-Alpha](https://arxiv.org/pdf/2310.00426) model architecture 
-Model weights found at ...
-Prompts structured as comma seperated Danbooru tags
+- Pretraining code for text-to-image latent diffusion transformer based off  [Pixart-Alpha](https://arxiv.org/pdf/2310.00426) model architecture 
+- Model weights found at Jumpr/FaceBooru-DiT-256x256px
+- Prompts must be structured as comma seperated Danbooru tags
 
 ## Usage
 
@@ -17,13 +17,34 @@ Prompts structured as comma seperated Danbooru tags
 - Classier-free guidance value of 10% training during late stage of training (last thousands of steps)
 - Frozen VAE for projecting and unprojecting image pixels into latent space (REPA-E/e2e-sdvae-hf, [Repa-E Paper](https://arxiv.org/abs/2504.10483))
 
+| | | 
+|---|---| 
+| Parameters (trainable) | ~179M (excludes frozen VAE and T5-small encoder) | 
+| Layers | 16 |
+| Hidden size | 768 | 
+| Attention heads | 12 (head dim 64) | 
+| Patch size | 2 | 
+| Latent channels (in/out) | 4 | 
+| Resolution | 256x256 (32x32 latent, VAE downsample factor 8) | 
+| Grad Clip Val | 1.0 | 
+| Iterations | 250k (unsure) | 
+| Max LR | 1e-4 | 
+| Precision | bf16-mixed | 
+| Batch Size | 96 | 
+| Batch Acc | 1 | 
+| Optimizer | AdamW w/ default hyperparameters | 
+| LR Scheduler | OneCycleLR (10% warmup, cosine anneal) |
+
 ## Dataset
-- Mix of approx 80 epochs of each
+- Mix of approx 80 epochs on
      - puruchinera/anime-faces-256
      - aipracticecafe/anime-faces-256px
 
 ## Training Stack
-- 
+- Pytorch
+- Pytorch Lightning
+- HF Diffusers and Transformers
+- WandB
 
 ## Training
-- GPU: RTX A6000 Pro Ampere (~...hrs)
+- GPU: RTX A6000 Pro Ampere (~45hrs)
