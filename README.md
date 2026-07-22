@@ -4,7 +4,20 @@
 - Prompts must be structured as comma seperated Danbooru tags
 
 ## Usage
-
+- Requires CUDA compatible device
+- Requires HF and WandB accounts w/ API Keys
+Install dependencies and run training
+```bash
+bash run.sh
+```
+Runs training for a model based on preconfigured parameters in config yaml file
+```bash
+uv run python src/train.py
+```
+Uploads model weights to HF
+```bash
+uv run python upload.py
+```
 
 ## Issues
 - Not HF Compatible => Full DiT class must be present for inference
