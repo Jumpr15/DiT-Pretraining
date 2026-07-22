@@ -31,6 +31,7 @@ uv run python upload.py
 - Frozen VAE for projecting and unprojecting image pixels into latent space (REPA-E/e2e-sdvae-hf, [Repa-E Paper](https://arxiv.org/abs/2504.10483))
 
 Reference Pixart Alpha Model Architecture (From paper)
+
 <img width="681" height="874" alt="Pixart-Alpha model architecture" src="https://github.com/user-attachments/assets/24ce0f78-b4e2-4b48-8c1b-fb6716c0ee8e" />
 
 
